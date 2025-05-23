@@ -151,7 +151,9 @@ const ConversationHistory: React.FC = () => {
                 navigator.share({
                   title: "Tax Conversation Summary",
                   text: shareText,
-                }).catch(console.error);
+                }).catch(error => {
+                  console.error("Error in promise:", error);
+                });
               }
             }}
           />

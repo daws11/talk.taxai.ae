@@ -9,43 +9,37 @@ export async function POST(req: Request) {
 
     if (!name || !email || !password) {
       return NextResponse.json(
-        { message: 'Missing required fields' },
+        { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
     await connectDB();
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
-        { message: 'User already exists' },
+        { error: "Email already registered" },
         { status: 400 }
       );
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
     });
 
-    // Remove password from response
-    const { password: _, ...userWithoutPassword } = user.toObject();
-
-    return NextResponse.json(
-      { message: 'User created successfully', user: userWithoutPassword },
-      { status: 201 }
-    );
+    return NextResponse.json({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+    });
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(
-      { message: 'Error creating user' },
+      { error: "Failed to register user" },
       { status: 500 }
     );
   }

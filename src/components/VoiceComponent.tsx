@@ -62,12 +62,10 @@ const VoiceChat = () => {
       setCurrentSubtitle("");
     },
     onMessage: (message: string | Message) => {
-      console.log("Received message:", message);
       if (typeof message === 'string') {
         setCurrentSubtitle(message);
         setConversationTranscript(prev => {
           const newTranscript = [...prev, `Assistant: ${message}`];
-          console.log("Updated transcript with assistant message:", newTranscript);
           return newTranscript;
         });
       } else if (message && typeof message === 'object' && 'message' in message) {
@@ -78,7 +76,6 @@ const VoiceChat = () => {
           setConversationTranscript(prev => {
             const prefix = source === 'user' ? 'You: ' : 'Assistant: ';
             const newTranscript = [...prev, `${prefix}${messageText}`];
-            console.log("Updated transcript with message object:", newTranscript);
             return newTranscript;
           });
         }
@@ -121,7 +118,6 @@ const VoiceChat = () => {
           
           mediaRecorder.ondataavailable = (event) => {
             if (event.data.size > 0) {
-              console.log("Audio data available:", event.data);
             }
           };
         } catch (recorderError) {
@@ -161,11 +157,9 @@ const VoiceChat = () => {
   useEffect(() => {
     const handleUserSpeech = (event: CustomEvent<{ text: string }>) => {
       const text = event.detail?.text || '';
-      console.log("User speech event received:", text);
       if (text.trim()) {
         setConversationTranscript(prev => {
           const newTranscript = [...prev, `You: ${text}`];
-          console.log("Updated transcript with user speech:", newTranscript);
           return newTranscript;
         });
       }
@@ -198,12 +192,10 @@ const VoiceChat = () => {
       const conversationId = await conversation.startSession({
         agentId: process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID!,
       });
-      console.log("Started conversation:", conversationId);
       startTimeRef.current = new Date();
 
       setConversationTranscript(prev => {
         const newTranscript = [...prev, "Assistant: Hello! How can I help you today?"];
-        console.log("Added initial message to transcript:", newTranscript);
         return newTranscript;
       });
     } catch (error) {
@@ -258,9 +250,6 @@ const VoiceChat = () => {
       const duration = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
       const transcript = conversationTranscript.join("\n\n");
       
-      console.log("Current transcript before saving:", transcript);
-      console.log("Transcript array:", conversationTranscript);
-      
       // Validate transcript
       if (!transcript.trim()) {
         console.error("Empty transcript detected");
@@ -271,9 +260,7 @@ const VoiceChat = () => {
       let summary = conversationSummary;
       if (!summary && transcript.trim() && !isGeneratingSummary) {
         try {
-          console.log("Generating summary for transcript:", transcript);
           summary = await generateSummary(transcript);
-          console.log("Generated summary:", summary);
           setConversationSummary(summary);
         } catch (error) {
           console.warn("Failed to generate summary:", error);
@@ -290,8 +277,6 @@ const VoiceChat = () => {
         status: "completed"
       };
 
-      console.log("Saving conversation with data:", conversationData);
-
       const response = await fetch('/api/conversations', {
         method: 'POST',
         headers: {
@@ -306,14 +291,12 @@ const VoiceChat = () => {
       }
 
       const savedData = await response.json();
-      console.log("Server response:", savedData);
 
       if (!savedData.transcript || !savedData.summary) {
         throw new Error("Server returned invalid conversation data");
       }
       
       setSavedConversation(savedData);
-      console.log('Conversation saved successfully:', savedData);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to save conversation';
       console.error('Error saving conversation:', error);
@@ -340,7 +323,6 @@ const VoiceChat = () => {
       
       // Get current transcript
       const transcript = conversationTranscript.join("\n\n");
-      console.log("Final transcript before ending:", transcript);
       
       // Validate transcript before proceeding
       if (!transcript.trim()) {
@@ -354,9 +336,7 @@ const VoiceChat = () => {
       // Generate summary before showing conclusion
       if (!conversationSummary && !isGeneratingSummary) {
         try {
-          console.log("Generating summary before showing conclusion");
           const summary = await generateSummary(transcript);
-          console.log("Generated summary for conclusion:", summary);
           setConversationSummary(summary);
         } catch (error) {
           console.warn("Failed to generate summary for conclusion:", error);
@@ -369,7 +349,6 @@ const VoiceChat = () => {
         await saveConversation();
         // Only show conclusion after successful save
         if (savedConversation?.transcript && savedConversation?.summary) {
-          console.log("Showing conclusion with saved data:", savedConversation);
           setShowConclusion(true);
         } else {
           throw new Error("Failed to save conversation data");
@@ -468,7 +447,6 @@ const VoiceChat = () => {
       
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          console.log("Audio data available:", event.data);
         }
       };
 
