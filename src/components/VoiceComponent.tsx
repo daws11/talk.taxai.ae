@@ -48,6 +48,10 @@ const VoiceChat = () => {
   const [isSpeakerDropdownOpen, setIsSpeakerDropdownOpen] = useState(false);
   const micDropdownRef = useRef<HTMLDivElement>(null);
   const speakerDropdownRef = useRef<HTMLDivElement>(null);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isUsingSpeaker, setIsUsingSpeaker] = useState(false);
+  const [audioOutputMode, setAudioOutputMode] = useState<'auto' | 'speaker' | 'earpiece'>('auto');
 
   const conversation = useConversation({
     onConnect: () => {
@@ -380,21 +384,24 @@ const VoiceChat = () => {
         }));
       setAudioDevices(audioInputs);
       
-      // Get output devices (speakers)
-      const audioOutputs = devices
-        .filter(device => device.kind === 'audiooutput')
-        .map(device => ({
-          deviceId: device.deviceId,
-          label: device.label || `Speaker ${device.deviceId.slice(0, 5)}`
-        }));
-      setSpeakerDevices(audioOutputs);
+      // Get output devices for non-mobile devices
+      if (!isMobile) {
+        const audioOutputs = devices
+          .filter(device => device.kind === 'audiooutput')
+          .map(device => ({
+            deviceId: device.deviceId,
+            label: device.label || `Speaker ${device.deviceId.slice(0, 5)}`
+          }));
+        setSpeakerDevices(audioOutputs);
+        
+        if (audioOutputs.length > 0 && !selectedSpeakerId) {
+          setSelectedSpeakerId(audioOutputs[0].deviceId);
+        }
+      }
       
-      // Set default devices if none selected
+      // Set default input device if none selected
       if (audioInputs.length > 0 && !selectedDeviceId) {
         setSelectedDeviceId(audioInputs[0].deviceId);
-      }
-      if (audioOutputs.length > 0 && !selectedSpeakerId) {
-        setSelectedSpeakerId(audioOutputs[0].deviceId);
       }
     } catch (error) {
       console.error('Error loading audio devices:', error);
@@ -448,30 +455,54 @@ const VoiceChat = () => {
     }
   };
 
-  const switchSpeakerDevice = async (deviceId: string) => {
+  const setAudioOutput = async (mode: 'auto' | 'speaker' | 'earpiece') => {
     try {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AudioContext();
-      }
-
-      // Create a new audio destination node
-      if (audioDestinationRef.current) {
-        audioDestinationRef.current.disconnect();
-      }
-      audioDestinationRef.current = audioContextRef.current.createMediaStreamDestination();
-
-      // Set the audio output device
-      if ('setSinkId' in HTMLAudioElement.prototype) {
-        const audioElements = document.getElementsByTagName('audio');
+      const audioElements = document.getElementsByTagName('audio');
+      
+      if (isMobile) {
+        // For mobile devices
         for (let i = 0; i < audioElements.length; i++) {
-          await (audioElements[i] as any).setSinkId(deviceId);
+          const audio = audioElements[i] as HTMLAudioElement;
+          try {
+            // @ts-ignore - Mobile specific property
+            if (audio.setSinkId) {
+              // @ts-ignore
+              await audio.setSinkId(mode === 'speaker' ? 'speaker' : 'default');
+            }
+          } catch (e) {
+            console.warn('setSinkId not supported:', e);
+          }
+        }
+        
+        // Additional handling for Android
+        if (/Android/i.test(navigator.userAgent)) {
+          try {
+            // @ts-ignore - Android specific
+            if (window.audioContext && window.audioContext.setSinkId) {
+              // @ts-ignore
+              await window.audioContext.setSinkId(mode === 'speaker' ? 'speaker' : 'default');
+            }
+          } catch (e) {
+            console.warn('Android audio context not supported:', e);
+          }
+        }
+      } else {
+        // For desktop devices
+        for (let i = 0; i < audioElements.length; i++) {
+          const audio = audioElements[i] as HTMLAudioElement;
+          if ('setSinkId' in HTMLAudioElement.prototype) {
+            const deviceId = mode === 'auto' ? selectedSpeakerId : 
+                           mode === 'speaker' ? 'speaker' : 'default';
+            await (audio as any).setSinkId(deviceId);
+          }
         }
       }
-
-      setSelectedSpeakerId(deviceId);
+      
+      setAudioOutputMode(mode);
+      setIsUsingSpeaker(mode === 'speaker');
     } catch (error) {
-      console.error('Error switching speaker device:', error);
-      setErrorMessage('Failed to switch speaker device');
+      console.error('Error setting audio output:', error);
+      setErrorMessage('Failed to change audio output');
     }
   };
 
@@ -494,6 +525,25 @@ const VoiceChat = () => {
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    // Detect iOS device
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(isIOSDevice);
+  }, []);
+
+  useEffect(() => {
+    // Detect mobile device
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    setIsMobile(isMobileDevice);
+    
+    // Set initial audio output mode based on device
+    if (isMobileDevice) {
+      // Default to speaker for mobile devices
+      setAudioOutputMode('speaker');
+      setIsUsingSpeaker(true);
+    }
   }, []);
 
   return (
@@ -730,51 +780,96 @@ const VoiceChat = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-gray-300">Select Speaker</h3>
-                  {isLoadingDevices ? (
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                  <h3 className="text-sm font-medium text-gray-300">Audio Output</h3>
+                  {isMobile ? (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-3 gap-2">
+                        <Button
+                          onClick={() => setAudioOutput('auto')}
+                          className={`flex items-center justify-center p-3 rounded-lg text-sm ${
+                            audioOutputMode === 'auto'
+                              ? 'bg-indigo-500/20 text-white'
+                              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800/70'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <Volume2 className="h-4 w-4" />
+                            Auto
+                          </span>
+                        </Button>
+                        <Button
+                          onClick={() => setAudioOutput('speaker')}
+                          className={`flex items-center justify-center p-3 rounded-lg text-sm ${
+                            audioOutputMode === 'speaker'
+                              ? 'bg-indigo-500/20 text-white'
+                              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800/70'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <Volume2 className="h-4 w-4" />
+                            Speaker
+                          </span>
+                        </Button>
+                        <Button
+                          onClick={() => setAudioOutput('earpiece')}
+                          className={`flex items-center justify-center p-3 rounded-lg text-sm ${
+                            audioOutputMode === 'earpiece'
+                              ? 'bg-indigo-500/20 text-white'
+                              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800/70'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <Volume2 className="h-4 w-4" />
+                            Earpiece
+                          </span>
+                        </Button>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {isMobile ? 
+                          "On mobile devices, you can choose between speaker and earpiece" :
+                          "Select your preferred audio output device"}
+                      </p>
                     </div>
-                  ) : speakerDevices.length === 0 ? (
-                    <p className="text-sm text-gray-400">No speakers found</p>
                   ) : (
-                    <div className="relative" ref={speakerDropdownRef}>
-                      <button
-                        onClick={() => setIsSpeakerDropdownOpen(!isSpeakerDropdownOpen)}
-                        className="w-full flex items-center justify-between p-3 rounded-lg text-sm bg-gray-800/50 border border-gray-700/30 text-gray-300 hover:bg-gray-800/70"
-                      >
-                        <span className="flex items-center gap-2">
-                          <Volume2 className="h-4 w-4" />
-                          {speakerDevices.find(d => d.deviceId === selectedSpeakerId)?.label || 'Select speaker'}
-                        </span>
-                        <ChevronDown className={`h-4 w-4 transition-transform ${isSpeakerDropdownOpen ? 'rotate-180' : ''}`} />
-                      </button>
-                      {isSpeakerDropdownOpen && (
-                        <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                          {speakerDevices.map((device) => (
-                            <button
-                              key={device.deviceId}
-                              onClick={() => {
-                                switchSpeakerDevice(device.deviceId);
-                                setIsSpeakerDropdownOpen(false);
-                              }}
-                              className={`w-full flex items-center justify-between p-3 text-sm hover:bg-gray-700/50 ${
-                                selectedSpeakerId === device.deviceId
-                                  ? 'bg-indigo-500/20 text-white'
-                                  : 'text-gray-300'
-                              }`}
-                            >
-                              <span className="flex items-center gap-2">
-                                <Volume2 className="h-4 w-4" />
-                                {device.label}
-                              </span>
-                              {selectedSpeakerId === device.deviceId && (
-                                <Check className="h-4 w-4 text-indigo-400" />
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                    <div className="space-y-2">
+                      <div className="relative" ref={speakerDropdownRef}>
+                        <button
+                          onClick={() => setIsSpeakerDropdownOpen(!isSpeakerDropdownOpen)}
+                          className="w-full flex items-center justify-between p-3 rounded-lg text-sm bg-gray-800/50 border border-gray-700/30 text-gray-300 hover:bg-gray-800/70"
+                        >
+                          <span className="flex items-center gap-2">
+                            <Volume2 className="h-4 w-4" />
+                            {speakerDevices.find(d => d.deviceId === selectedSpeakerId)?.label || 'Select speaker'}
+                          </span>
+                          <ChevronDown className={`h-4 w-4 transition-transform ${isSpeakerDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {isSpeakerDropdownOpen && (
+                          <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                            {speakerDevices.map((device) => (
+                              <button
+                                key={device.deviceId}
+                                onClick={() => {
+                                  switchAudioDevice(device.deviceId);
+                                  setIsSpeakerDropdownOpen(false);
+                                }}
+                                className={`w-full flex items-center justify-between p-3 text-sm hover:bg-gray-700/50 ${
+                                  selectedSpeakerId === device.deviceId
+                                    ? 'bg-indigo-500/20 text-white'
+                                    : 'text-gray-300'
+                                }`}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <Volume2 className="h-4 w-4" />
+                                  {device.label}
+                                </span>
+                                {selectedSpeakerId === device.deviceId && (
+                                  <Check className="h-4 w-4 text-indigo-400" />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
