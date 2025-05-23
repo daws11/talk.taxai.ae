@@ -5,7 +5,7 @@ import { useConversation } from "@11labs/react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mic, MicOff, Volume2, VolumeX, Settings, Loader2, Check, X } from "lucide-react";
+import { Mic, MicOff, Volume2, VolumeX, Settings, Loader2, Check, X, ChevronDown } from "lucide-react";
 import Conclusion from "./Conclusion";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -38,8 +38,16 @@ const VoiceChat = () => {
   const [isEndingConversation, setIsEndingConversation] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
+  const [speakerDevices, setSpeakerDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
+  const [selectedSpeakerId, setSelectedSpeakerId] = useState<string>("");
   const [isLoadingDevices, setIsLoadingDevices] = useState(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioDestinationRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const [isMicDropdownOpen, setIsMicDropdownOpen] = useState(false);
+  const [isSpeakerDropdownOpen, setIsSpeakerDropdownOpen] = useState(false);
+  const micDropdownRef = useRef<HTMLDivElement>(null);
+  const speakerDropdownRef = useRef<HTMLDivElement>(null);
 
   const conversation = useConversation({
     onConnect: () => {
@@ -396,6 +404,8 @@ const VoiceChat = () => {
     try {
       setIsLoadingDevices(true);
       const devices = await navigator.mediaDevices.enumerateDevices();
+      
+      // Get input devices (microphones)
       const audioInputs = devices
         .filter(device => device.kind === 'audioinput')
         .map(device => ({
@@ -404,9 +414,21 @@ const VoiceChat = () => {
         }));
       setAudioDevices(audioInputs);
       
-      // Set default device if none selected
+      // Get output devices (speakers)
+      const audioOutputs = devices
+        .filter(device => device.kind === 'audiooutput')
+        .map(device => ({
+          deviceId: device.deviceId,
+          label: device.label || `Speaker ${device.deviceId.slice(0, 5)}`
+        }));
+      setSpeakerDevices(audioOutputs);
+      
+      // Set default devices if none selected
       if (audioInputs.length > 0 && !selectedDeviceId) {
         setSelectedDeviceId(audioInputs[0].deviceId);
+      }
+      if (audioOutputs.length > 0 && !selectedSpeakerId) {
+        setSelectedSpeakerId(audioOutputs[0].deviceId);
       }
     } catch (error) {
       console.error('Error loading audio devices:', error);
@@ -461,11 +483,53 @@ const VoiceChat = () => {
     }
   };
 
+  const switchSpeakerDevice = async (deviceId: string) => {
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContext();
+      }
+
+      // Create a new audio destination node
+      if (audioDestinationRef.current) {
+        audioDestinationRef.current.disconnect();
+      }
+      audioDestinationRef.current = audioContextRef.current.createMediaStreamDestination();
+
+      // Set the audio output device
+      if ('setSinkId' in HTMLAudioElement.prototype) {
+        const audioElements = document.getElementsByTagName('audio');
+        for (let i = 0; i < audioElements.length; i++) {
+          await (audioElements[i] as any).setSinkId(deviceId);
+        }
+      }
+
+      setSelectedSpeakerId(deviceId);
+    } catch (error) {
+      console.error('Error switching speaker device:', error);
+      setErrorMessage('Failed to switch speaker device');
+    }
+  };
+
   useEffect(() => {
     if (showSettings) {
       loadAudioDevices();
     }
   }, [showSettings]);
+
+  // Add click outside handler for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (micDropdownRef.current && !micDropdownRef.current.contains(event.target as Node)) {
+        setIsMicDropdownOpen(false);
+      }
+      if (speakerDropdownRef.current && !speakerDropdownRef.current.contains(event.target as Node)) {
+        setIsSpeakerDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -649,7 +713,7 @@ const VoiceChat = () => {
                   </Button>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <h3 className="text-sm font-medium text-gray-300">Select Microphone</h3>
                   {isLoadingDevices ? (
@@ -659,29 +723,97 @@ const VoiceChat = () => {
                   ) : audioDevices.length === 0 ? (
                     <p className="text-sm text-gray-400">No microphones found</p>
                   ) : (
-                    <div className="space-y-2">
-                      {audioDevices.map((device) => (
-                        <button
-                          key={device.deviceId}
-                          onClick={() => switchAudioDevice(device.deviceId)}
-                          className={`w-full flex items-center justify-between p-3 rounded-lg text-sm transition-colors ${
-                            selectedDeviceId === device.deviceId
-                              ? 'bg-indigo-500/20 border border-indigo-500/30 text-white'
-                              : 'bg-gray-800/50 border border-gray-700/30 text-gray-300 hover:bg-gray-800/70'
-                          }`}
-                        >
-                          <span className="flex items-center gap-2">
-                            <Mic className="h-4 w-4" />
-                            {device.label}
-                          </span>
-                          {selectedDeviceId === device.deviceId && (
-                            <Check className="h-4 w-4 text-indigo-400" />
-                          )}
-                        </button>
-                      ))}
+                    <div className="relative" ref={micDropdownRef}>
+                      <button
+                        onClick={() => setIsMicDropdownOpen(!isMicDropdownOpen)}
+                        className="w-full flex items-center justify-between p-3 rounded-lg text-sm bg-gray-800/50 border border-gray-700/30 text-gray-300 hover:bg-gray-800/70"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Mic className="h-4 w-4" />
+                          {audioDevices.find(d => d.deviceId === selectedDeviceId)?.label || 'Select microphone'}
+                        </span>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${isMicDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      {isMicDropdownOpen && (
+                        <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                          {audioDevices.map((device) => (
+                            <button
+                              key={device.deviceId}
+                              onClick={() => {
+                                switchAudioDevice(device.deviceId);
+                                setIsMicDropdownOpen(false);
+                              }}
+                              className={`w-full flex items-center justify-between p-3 text-sm hover:bg-gray-700/50 ${
+                                selectedDeviceId === device.deviceId
+                                  ? 'bg-indigo-500/20 text-white'
+                                  : 'text-gray-300'
+                              }`}
+                            >
+                              <span className="flex items-center gap-2">
+                                <Mic className="h-4 w-4" />
+                                {device.label}
+                              </span>
+                              {selectedDeviceId === device.deviceId && (
+                                <Check className="h-4 w-4 text-indigo-400" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-gray-300">Select Speaker</h3>
+                  {isLoadingDevices ? (
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                    </div>
+                  ) : speakerDevices.length === 0 ? (
+                    <p className="text-sm text-gray-400">No speakers found</p>
+                  ) : (
+                    <div className="relative" ref={speakerDropdownRef}>
+                      <button
+                        onClick={() => setIsSpeakerDropdownOpen(!isSpeakerDropdownOpen)}
+                        className="w-full flex items-center justify-between p-3 rounded-lg text-sm bg-gray-800/50 border border-gray-700/30 text-gray-300 hover:bg-gray-800/70"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Volume2 className="h-4 w-4" />
+                          {speakerDevices.find(d => d.deviceId === selectedSpeakerId)?.label || 'Select speaker'}
+                        </span>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${isSpeakerDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      {isSpeakerDropdownOpen && (
+                        <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                          {speakerDevices.map((device) => (
+                            <button
+                              key={device.deviceId}
+                              onClick={() => {
+                                switchSpeakerDevice(device.deviceId);
+                                setIsSpeakerDropdownOpen(false);
+                              }}
+                              className={`w-full flex items-center justify-between p-3 text-sm hover:bg-gray-700/50 ${
+                                selectedSpeakerId === device.deviceId
+                                  ? 'bg-indigo-500/20 text-white'
+                                  : 'text-gray-300'
+                              }`}
+                            >
+                              <span className="flex items-center gap-2">
+                                <Volume2 className="h-4 w-4" />
+                                {device.label}
+                              </span>
+                              {selectedSpeakerId === device.deviceId && (
+                                <Check className="h-4 w-4 text-indigo-400" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <div className="pt-4 border-t border-gray-800">
                   <Button
                     variant="outline"
