@@ -15,44 +15,56 @@ export async function POST(req: Request) {
     await connectToDatabase();
 
     const body = await req.json();
+    const { transcript, summary, duration, status, startTime, endTime } = body;
 
-    const { transcript, summary, duration, status } = body;
-
+    // Basic validation
     if (!transcript || typeof transcript !== 'string') {
-      console.error("Invalid transcript:", transcript);
       return NextResponse.json({ error: "Invalid transcript" }, { status: 400 });
     }
 
     if (!transcript.trim()) {
-      console.error("Empty transcript");
       return NextResponse.json({ error: "Empty transcript" }, { status: 400 });
     }
 
+    // Create conversation with all fields
     const conversationData = {
       userId: session.user.id,
-      transcript,
-      summary,
-      duration,
-      status,
-      createdAt: new Date(),
+      transcript: transcript.trim(),
+      summary: summary?.trim() || "No summary available",
+      duration: duration || 0,
+      status: status || "completed",
+      startTime: startTime ? new Date(startTime) : new Date(),
+      endTime: endTime ? new Date(endTime) : new Date(),
     };
 
-    const conversation = await Conversation.create(conversationData);
+    try {
+      const conversation = await Conversation.create(conversationData);
+      
+      if (!conversation || !conversation._id) {
+        throw new Error("Failed to create conversation");
+      }
 
-    const response = {
-      id: conversation._id,
-      transcript: conversation.transcript,
-      summary: conversation.summary,
-      duration: conversation.duration,
-      status: conversation.status,
-      createdAt: conversation.createdAt,
-    };
-
-    return NextResponse.json(response);
+      return NextResponse.json({
+        _id: conversation._id,
+        transcript: conversation.transcript,
+        summary: conversation.summary,
+        duration: conversation.duration,
+        status: conversation.status,
+        startTime: conversation.startTime,
+        endTime: conversation.endTime,
+        createdAt: conversation.createdAt,
+      });
+    } catch (dbError) {
+      console.error("Database error:", dbError);
+      return NextResponse.json(
+        { error: "Failed to save conversation to database" },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error("Error saving conversation:", error);
     return NextResponse.json(
-      { error: "Failed to save conversation" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
@@ -70,7 +82,7 @@ export async function GET(req: Request) {
 
     const conversations = await Conversation.find({ userId: session.user.id })
       .sort({ createdAt: -1 })
-      .select('transcript summary duration status createdAt');
+      .select('_id transcript summary duration status startTime endTime createdAt');
 
     return NextResponse.json(conversations);
   } catch (error) {

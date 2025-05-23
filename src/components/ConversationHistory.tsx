@@ -11,8 +11,7 @@ interface Conversation {
   transcript: string;
   summary: string;
   duration: number;
-  startTime: string;
-  endTime: string;
+  createdAt: string;
   status: string;
 }
 
@@ -45,11 +44,19 @@ const ConversationHistory: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    }).format(date);
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return "Invalid date";
+      }
+      return new Intl.DateTimeFormat('en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      }).format(date);
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Invalid date";
+    }
   };
 
   const formatDuration = (seconds: number) => {
@@ -105,7 +112,7 @@ const ConversationHistory: React.FC = () => {
                           <div className="flex items-center gap-4 text-xs text-gray-400">
                             <div className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              <span>{formatDate(conversation.startTime)}</span>
+                              <span>{formatDate(conversation.createdAt)}</span>
                             </div>
                             <span>•</span>
                             <span>{formatDuration(conversation.duration)}</span>

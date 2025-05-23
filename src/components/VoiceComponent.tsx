@@ -235,7 +235,7 @@ const VoiceChat = () => {
     }
   };
 
-  const saveConversation = async (): Promise<void> => {
+  const saveConversation = async (): Promise<any> => {
     if (!session?.user?.id || !startTimeRef.current) {
       setErrorMessage("Cannot save conversation: User not authenticated");
       return;
@@ -252,7 +252,6 @@ const VoiceChat = () => {
       
       // Validate transcript
       if (!transcript.trim()) {
-        console.error("Empty transcript detected");
         throw new Error("Cannot save empty conversation");
       }
       
@@ -263,7 +262,6 @@ const VoiceChat = () => {
           summary = await generateSummary(transcript);
           setConversationSummary(summary);
         } catch (error) {
-          console.warn("Failed to generate summary:", error);
           summary = "Failed to generate summary";
         }
       }
@@ -272,9 +270,9 @@ const VoiceChat = () => {
         transcript: transcript.trim(),
         summary: summary?.trim() || "No summary available",
         duration,
+        status: "completed",
         startTime,
-        endTime,
-        status: "completed"
+        endTime
       };
 
       const response = await fetch('/api/conversations', {
@@ -287,19 +285,18 @@ const VoiceChat = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || errorData.details || 'Failed to save conversation');
+        throw new Error(errorData.error || 'Failed to save conversation');
       }
 
       const savedData = await response.json();
-
-      if (!savedData.transcript || !savedData.summary) {
+      
+      if (!savedData || !savedData._id) {
         throw new Error("Server returned invalid conversation data");
       }
       
-      setSavedConversation(savedData);
+      return savedData;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to save conversation';
-      console.error('Error saving conversation:', error);
       setErrorMessage(errorMessage);
       throw error;
     } finally {
@@ -326,10 +323,8 @@ const VoiceChat = () => {
       
       // Validate transcript before proceeding
       if (!transcript.trim()) {
-        console.error("Empty transcript detected when ending conversation");
         setErrorMessage("Cannot save empty conversation");
         setShowConclusion(true);
-        setIsEndingConversation(false);
         return;
       }
       
@@ -339,30 +334,22 @@ const VoiceChat = () => {
           const summary = await generateSummary(transcript);
           setConversationSummary(summary);
         } catch (error) {
-          console.warn("Failed to generate summary for conclusion:", error);
           setConversationSummary("Failed to generate summary");
         }
       }
       
       // Try to save conversation
       try {
-        await saveConversation();
-        // Only show conclusion after successful save
-        if (savedConversation?.transcript && savedConversation?.summary) {
-          setShowConclusion(true);
-        } else {
-          throw new Error("Failed to save conversation data");
-        }
-      } catch (error) {
-        console.error("Error saving conversation in handleEndConversation:", error);
-        // If save fails, still show conclusion but with error message
+        const savedData = await saveConversation();
+        setSavedConversation(savedData);
         setShowConclusion(true);
-        setErrorMessage("Conversation ended but failed to save. Please try saving again.");
+      } catch (error) {
+        setShowConclusion(true);
+        setErrorMessage("Failed to save conversation. Please try saving again.");
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to end conversation";
       setErrorMessage(errorMessage);
-      console.error("Error ending conversation:", error);
       setShowConclusion(true);
     } finally {
       setIsEndingConversation(false);
