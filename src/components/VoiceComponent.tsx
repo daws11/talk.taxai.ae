@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mic, MicOff, Volume2, VolumeX, Settings, Loader2, Check, X, ChevronDown } from "lucide-react";
 import Conclusion from "./Conclusion";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Message {
   message: string;
@@ -21,6 +22,7 @@ interface MediaDeviceInfo {
 
 const VoiceChat = () => {
   const { data: session } = useSession();
+  const { t } = useLanguage();
   const [hasPermission, setHasPermission] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -554,7 +556,7 @@ const VoiceChat = () => {
             <CardTitle className="flex items-center justify-between text-white">
               <div className="flex items-center space-x-2">
                 <div className={`w-3 h-3 rounded-full ${status === "connected" ? "bg-green-500" : "bg-gray-500"}`} />
-                <span>Voice Assistant</span>
+                <span>{t('voice.title')}</span>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -596,12 +598,12 @@ const VoiceChat = () => {
                         <div className="absolute inset-0 flex items-center justify-center">
                           <Loader2 className="h-8 w-8 animate-spin text-white" />
                         </div>
-                        <span className="opacity-0">End</span>
+                        <span className="opacity-0">{t('voice.end')}</span>
                       </>
                     ) : (
                       <>
                         <MicOff className="h-6 w-6" />
-                        <span className="text-sm">End</span>
+                        <span className="text-sm">{t('voice.end')}</span>
                       </>
                     )}
                   </Button>
@@ -612,7 +614,7 @@ const VoiceChat = () => {
                     className="w-24 h-24 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex flex-col items-center justify-center gap-2"
                   >
                     <Mic className="h-6 w-6" />
-                    <span className="text-sm">Start</span>
+                    <span className="text-sm">{t('voice.start')}</span>
                   </Button>
                 )}
               </div>
@@ -620,7 +622,7 @@ const VoiceChat = () => {
               <div className="text-center text-sm space-y-2">
                 {!isBrowserSupported && (
                   <p className="text-red-400 bg-red-900/20 p-2 rounded">
-                    {errorMessage}
+                    {t('voice.browserNotSupported')}
                   </p>
                 )}
                 {status === "connected" && (
@@ -628,12 +630,12 @@ const VoiceChat = () => {
                     {isEndingConversation ? (
                       <span className="flex items-center justify-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Processing conversation...
+                        {t('voice.processing')}
                       </span>
                     ) : isSpeaking ? (
-                      "Agent is speaking..."
+                      t('voice.agentSpeaking')
                     ) : (
-                      "Listening..."
+                      t('voice.listening')
                     )}
                   </p>
                 )}
@@ -644,7 +646,7 @@ const VoiceChat = () => {
                 )}
                 {!hasPermission && isBrowserSupported && (
                   <p className="text-yellow-400 bg-yellow-900/20 p-2 rounded">
-                    Please allow microphone access to use voice chat
+                    {t('voice.microphoneRequired')}
                   </p>
                 )}
               </div>
@@ -669,10 +671,10 @@ const VoiceChat = () => {
                 </div>
               </div>
               <p className="text-gray-300 text-center">
-                Processing your conversation...
+                {t('voice.processing')}
               </p>
               <p className="text-gray-400 text-sm text-center">
-                Generating summary and saving transcript
+                {t('conclusion.generatingSummary')}
               </p>
             </div>
           </motion.div>
@@ -682,7 +684,7 @@ const VoiceChat = () => {
       {showConclusion && (
         <Conclusion
           transcript={savedConversation?.transcript || conversationTranscript.join("\n\n")}
-          summary={isGeneratingSummary ? "Generating summary..." : (savedConversation?.summary || conversationSummary || "No summary available")}
+          summary={isGeneratingSummary ? t('conclusion.generating') : (savedConversation?.summary || conversationSummary || t('history.noSummary'))}
           onClose={() => {
             setShowConclusion(false);
             setSavedConversation(null);
@@ -694,11 +696,11 @@ const VoiceChat = () => {
           onShare={() => {
             if (navigator.share) {
               const shareText = savedConversation 
-                ? `${savedConversation.summary}\n\nFull Transcript:\n${savedConversation.transcript}`
-                : `${conversationSummary || "No summary available"}\n\nFull Transcript:\n${conversationTranscript.join("\n\n")}`;
+                ? `${savedConversation.summary}\n\n${t('conclusion.transcript')}:\n${savedConversation.transcript}`
+                : `${conversationSummary || t('history.noSummary')}\n\n${t('conclusion.transcript')}:\n${conversationTranscript.join("\n\n")}`;
               
               navigator.share({
-                title: "Tax Conversation Summary",
+                title: t('conclusion.title'),
                 text: shareText,
               }).catch(console.error);
             }
@@ -717,7 +719,7 @@ const VoiceChat = () => {
             <Card className="w-full max-w-md bg-gray-900/95 border-gray-800">
               <CardHeader>
                 <CardTitle className="text-white flex items-center justify-between">
-                  <span>Audio Settings</span>
+                  <span>{t('settings.title')}</span>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -730,13 +732,13 @@ const VoiceChat = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-gray-300">Select Microphone</h3>
+                  <h3 className="text-sm font-medium text-gray-300">{t('settings.microphone')}</h3>
                   {isLoadingDevices ? (
                     <div className="flex items-center justify-center py-4">
                       <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
                     </div>
                   ) : audioDevices.length === 0 ? (
-                    <p className="text-sm text-gray-400">No microphones found</p>
+                    <p className="text-sm text-gray-400">{t('settings.noMicrophones')}</p>
                   ) : (
                     <div className="relative" ref={micDropdownRef}>
                       <button
@@ -745,7 +747,7 @@ const VoiceChat = () => {
                       >
                         <span className="flex items-center gap-2">
                           <Mic className="h-4 w-4" />
-                          {audioDevices.find(d => d.deviceId === selectedDeviceId)?.label || 'Select microphone'}
+                          {audioDevices.find(d => d.deviceId === selectedDeviceId)?.label || t('settings.microphone')}
                         </span>
                         <ChevronDown className={`h-4 w-4 transition-transform ${isMicDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
@@ -780,7 +782,7 @@ const VoiceChat = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-gray-300">Audio Output</h3>
+                  <h3 className="text-sm font-medium text-gray-300">{t('settings.audioOutput')}</h3>
                   {isMobile ? (
                     <div className="space-y-2">
                       <div className="grid grid-cols-3 gap-2">
@@ -794,7 +796,7 @@ const VoiceChat = () => {
                         >
                           <span className="flex items-center gap-2">
                             <Volume2 className="h-4 w-4" />
-                            Auto
+                            {t('settings.auto')}
                           </span>
                         </Button>
                         <Button
@@ -807,7 +809,7 @@ const VoiceChat = () => {
                         >
                           <span className="flex items-center gap-2">
                             <Volume2 className="h-4 w-4" />
-                            Speaker
+                            {t('settings.speaker')}
                           </span>
                         </Button>
                         <Button
@@ -820,14 +822,12 @@ const VoiceChat = () => {
                         >
                           <span className="flex items-center gap-2">
                             <Volume2 className="h-4 w-4" />
-                            Earpiece
+                            {t('settings.earpiece')}
                           </span>
                         </Button>
                       </div>
                       <p className="text-xs text-gray-400 mt-1">
-                        {isMobile ? 
-                          "On mobile devices, you can choose between speaker and earpiece" :
-                          "Select your preferred audio output device"}
+                        {isMobile ? t('settings.mobileAudioOutput') : t('settings.desktopAudioOutput')}
                       </p>
                     </div>
                   ) : (
@@ -839,7 +839,7 @@ const VoiceChat = () => {
                         >
                           <span className="flex items-center gap-2">
                             <Volume2 className="h-4 w-4" />
-                            {speakerDevices.find(d => d.deviceId === selectedSpeakerId)?.label || 'Select speaker'}
+                            {speakerDevices.find(d => d.deviceId === selectedSpeakerId)?.label || t('settings.speakerDevice')}
                           </span>
                           <ChevronDown className={`h-4 w-4 transition-transform ${isSpeakerDropdownOpen ? 'rotate-180' : ''}`} />
                         </button>
@@ -880,7 +880,7 @@ const VoiceChat = () => {
                     onClick={() => setShowSettings(false)}
                     className="w-full text-gray-300 hover:text-white border-gray-700 hover:border-gray-600"
                   >
-                    Close
+                    {t('settings.close')}
                   </Button>
                 </div>
               </CardContent>

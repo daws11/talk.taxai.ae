@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "welcome": "Welcome back",
+    "signOut": "Sign Out",
+    "settings": "Settings",
+    "language": "Language",
+    "assistantDescription": "Your intelligent tax assistant powered by AI"
+  },
+  "voice": {
+    "title": "Voice Assistant",
+    "start": "Start",
+    "end": "End",
+    "listening": "Listening...",
+    "processing": "Processing conversation...",
+    "agentSpeaking": "Agent is speaking...",
+    "browserNotSupported": "Your browser doesn't support audio recording. Please use a modern browser like Chrome, Firefox, or Edge.",
+    "microphoneRequired": "The app requires microphone access to work",
+    "realTimeProcessing": "Real-time Voice Processing",
+    "aiResponses": "AI-Powered Responses",
+    "liveTranscription": "Live Transcription"
+  },
+  "settings": {
+    "title": "Settings",
+    "microphone": "Select Microphone",
+    "speakerDevice": "Select Speaker",
+    "audioOutput": "Audio Output",
+    "auto": "Auto",
+    "speaker": "Speaker",
+    "earpiece": "Earpiece",
+    "close": "Close",
+    "noMicrophones": "No microphones found",
+    "mobileAudioOutput": "On mobile devices, you can choose between speaker and earpiece",
+    "desktopAudioOutput": "Select your preferred audio output device"
+  },
+  "language": {
+    "english": "English",
+    "arabic": "Arabic"
+  },
+  "history": {
+    "title": "Conversation History",
+    "loading": "Loading conversations...",
+    "error": "Failed to load conversations",
+    "empty": "No conversation history yet",
+    "view": "View",
+    "noSummary": "No summary available",
+    "duration": "{{minutes}}m {{seconds}}s"
+  },
+  "conclusion": {
+    "title": "Conversation Conclusion",
+    "generating": "Generating Conclusion...",
+    "analyzing": "Analyzing conversation and generating summary...",
+    "summary": "Summary",
+    "transcript": "Full Transcript",
+    "you": "You",
+    "assistant": "Assistant",
+    "share": "Share",
+    "save": "Save",
+    "saving": "Saving...",
+    "generatingSummary": "Generating summary and saving transcript"
+  }
+} 

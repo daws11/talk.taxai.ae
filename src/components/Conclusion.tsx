@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Share2, Copy, CheckCircle2, Loader2, X, Save } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ConclusionProps {
   transcript: string;
@@ -23,6 +24,7 @@ const Conclusion: React.FC<ConclusionProps> = ({
   isSaving,
   onShare,
 }) => {
+  const { t } = useLanguage();
   const [isGenerating, setIsGenerating] = React.useState(true);
   const [showContent, setShowContent] = React.useState(false);
 
@@ -58,10 +60,10 @@ const Conclusion: React.FC<ConclusionProps> = ({
               {isGenerating ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin text-indigo-400" />
-                  <span>Generating Conclusion...</span>
+                  <span>{t('conclusion.generating')}</span>
                 </>
               ) : (
-                "Conversation Conclusion"
+                t('conclusion.title')
               )}
             </CardTitle>
             <Button
@@ -92,7 +94,7 @@ const Conclusion: React.FC<ConclusionProps> = ({
                   </div>
                 </div>
                 <p className="text-gray-400 text-center">
-                  Analyzing conversation and generating summary...
+                  {t('conclusion.analyzing')}
                 </p>
               </motion.div>
             ) : (
@@ -106,7 +108,7 @@ const Conclusion: React.FC<ConclusionProps> = ({
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-indigo-400" />
-                    Summary
+                    {t('conclusion.summary')}
                   </h3>
                   <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
                     <p className="text-gray-300 whitespace-pre-wrap">{summary}</p>
@@ -116,7 +118,7 @@ const Conclusion: React.FC<ConclusionProps> = ({
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-indigo-400" />
-                    Full Transcript
+                    {t('conclusion.transcript')}
                   </h3>
                   <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700 max-h-[40vh] overflow-y-auto">
                     <div className="space-y-4">
@@ -132,7 +134,7 @@ const Conclusion: React.FC<ConclusionProps> = ({
                             }`}
                           >
                             <p className="text-sm font-medium text-gray-400 mb-1">
-                              {isUser ? "You" : "Assistant"}
+                              {isUser ? t('conclusion.you') : t('conclusion.assistant')}
                             </p>
                             <p className="text-gray-300 whitespace-pre-wrap">
                               {message.replace(/^(You|Assistant):\s*/, "")}
@@ -151,7 +153,7 @@ const Conclusion: React.FC<ConclusionProps> = ({
                     className="text-gray-300 border-gray-700 hover:bg-gray-800 hover:text-white"
                   >
                     <Share2 className="h-4 w-4 mr-2" />
-                    Share
+                    {t('conclusion.share')}
                   </Button>
                   <Button
                     onClick={handleSave}
@@ -161,12 +163,12 @@ const Conclusion: React.FC<ConclusionProps> = ({
                     {isSaving ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Saving...
+                        {t('conclusion.saving')}
                       </>
                     ) : (
                       <>
                         <Save className="h-4 w-4 mr-2" />
-                        Save
+                        {t('conclusion.save')}
                       </>
                     )}
                   </Button>

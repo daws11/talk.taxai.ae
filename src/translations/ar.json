@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "welcome": "مرحباً بعودتك",
+    "signOut": "تسجيل الخروج",
+    "settings": "الإعدادات",
+    "language": "اللغة",
+    "assistantDescription": "مساعدك الضريبي الذكي المدعوم بالذكاء الاصطناعي"
+  },
+  "voice": {
+    "title": "المساعد الصوتي",
+    "start": "ابدأ",
+    "end": "إنهاء",
+    "listening": "جاري الاستماع...",
+    "processing": "جاري معالجة المحادثة...",
+    "agentSpeaking": "المساعد يتحدث...",
+    "browserNotSupported": "متصفحك لا يدعم التسجيل الصوتي. يرجى استخدام متصفح حديث مثل Chrome أو Firefox أو Edge.",
+    "microphoneRequired": "تتطلب التطبيق الوصول إلى الميكروفون للعمل",
+    "realTimeProcessing": "معالجة الصوت في الوقت الفعلي",
+    "aiResponses": "ردود مدعومة بالذكاء الاصطناعي",
+    "liveTranscription": "النسخ المباشر"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "microphone": "اختر الميكروفون",
+    "speakerDevice": "اختر السماعة",
+    "audioOutput": "مخرج الصوت",
+    "auto": "تلقائي",
+    "speaker": "سماعة",
+    "earpiece": "سماعة أذن",
+    "close": "إغلاق",
+    "noMicrophones": "لم يتم العثور على ميكروفونات",
+    "mobileAudioOutput": "على الأجهزة المحمولة، يمكنك الاختيار بين السماعة وسماعة الأذن",
+    "desktopAudioOutput": "اختر جهاز مخرج الصوت المفضل لديك"
+  },
+  "language": {
+    "english": "الإنجليزية",
+    "arabic": "العربية"
+  },
+  "history": {
+    "title": "سجل المحادثات",
+    "loading": "جاري تحميل المحادثات...",
+    "error": "فشل في تحميل المحادثات",
+    "empty": "لا يوجد سجل محادثات حتى الآن",
+    "view": "عرض",
+    "noSummary": "لا يوجد ملخص متاح",
+    "duration": "{{minutes}}د {{seconds}}ث"
+  },
+  "conclusion": {
+    "title": "خلاصة المحادثة",
+    "generating": "جاري إنشاء الخلاصة...",
+    "analyzing": "جاري تحليل المحادثة وإنشاء الملخص...",
+    "summary": "الملخص",
+    "transcript": "النص الكامل",
+    "you": "أنت",
+    "assistant": "المساعد",
+    "share": "مشاركة",
+    "save": "حفظ",
+    "saving": "جاري الحفظ...",
+    "generatingSummary": "جاري إنشاء الملخص وحفظ النص"
+  }
+} 

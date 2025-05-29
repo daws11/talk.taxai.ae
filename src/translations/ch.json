@@ -1,0 +1,61 @@
+{
+    "nav": {
+      "welcome": "欢迎回来",
+      "signOut": "退出登录",
+      "settings": "设置",
+      "language": "语言",
+      "assistantDescription": "您的智能AI税务助手"
+    },
+    "voice": {
+      "title": "语音助手",
+      "start": "开始",
+      "end": "结束",
+      "listening": "聆听中...",
+      "processing": "处理对话中...",
+      "agentSpeaking": "助手正在说话...",
+      "browserNotSupported": "您的浏览器不支持音频录制。请使用Chrome、Firefox或Edge等现代浏览器。",
+      "microphoneRequired": "应用需要使用麦克风才能工作",
+      "realTimeProcessing": "实时语音处理",
+      "aiResponses": "AI智能回复",
+      "liveTranscription": "实时转录"
+    },
+    "settings": {
+      "title": "设置",
+      "microphone": "选择麦克风",
+      "speakerDevice": "选择扬声器",
+      "audioOutput": "音频输出",
+      "auto": "自动",
+      "speaker": "扬声器",
+      "earpiece": "听筒",
+      "close": "关闭",
+      "noMicrophones": "未找到麦克风",
+      "mobileAudioOutput": "在移动设备上，您可以选择扬声器或听筒",
+      "desktopAudioOutput": "选择您偏好的音频输出设备"
+    },
+    "language": {
+      "english": "英语",
+      "arabic": "阿拉伯语"
+    },
+    "history": {
+      "title": "对话历史",
+      "loading": "加载对话中...",
+      "error": "加载对话失败",
+      "empty": "暂无对话历史",
+      "view": "查看",
+      "noSummary": "无可用摘要",
+      "duration": "{{minutes}}分{{seconds}}秒"
+    },
+    "conclusion": {
+      "title": "对话总结",
+      "generating": "生成总结中...",
+      "analyzing": "分析对话并生成摘要...",
+      "summary": "摘要",
+      "transcript": "完整记录",
+      "you": "您",
+      "assistant": "助手",
+      "share": "分享",
+      "save": "保存",
+      "saving": "保存中...",
+      "generatingSummary": "生成摘要并保存记录"
+    }
+  }

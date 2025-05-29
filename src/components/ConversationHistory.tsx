@@ -5,6 +5,7 @@ import * as ScrollArea from '@radix-ui/react-scroll-area';
 import { Clock, MessageSquare } from "lucide-react";
 import Conclusion from "./Conclusion";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Conversation {
   _id: string;
@@ -16,6 +17,7 @@ interface Conversation {
 }
 
 const ConversationHistory: React.FC = () => {
+  const { t } = useLanguage();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +64,7 @@ const ConversationHistory: React.FC = () => {
   const formatDuration = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds}s`;
+    return t('history.duration', { minutes, seconds: remainingSeconds });
   };
 
   const handleConversationClick = (conversation: Conversation) => {
@@ -76,21 +78,21 @@ const ConversationHistory: React.FC = () => {
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />
-            Conversation History
+            {t('history.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="text-center py-8 text-gray-400">
-              Loading conversations...
+              {t('history.loading')}
             </div>
           ) : error ? (
             <div className="text-center py-8 text-red-400">
-              {error}
+              {t('history.error')}
             </div>
           ) : conversations.length === 0 ? (
             <div className="text-center py-8 text-gray-400">
-              No conversation history yet
+              {t('history.empty')}
             </div>
           ) : (
             <ScrollArea.Root className="h-[400px] pr-4">
@@ -107,7 +109,7 @@ const ConversationHistory: React.FC = () => {
                       <div className="flex items-start justify-between">
                         <div className="space-y-1">
                           <p className="text-sm text-gray-300 line-clamp-2">
-                            {conversation.summary || "No summary available"}
+                            {conversation.summary || t('history.noSummary')}
                           </p>
                           <div className="flex items-center gap-4 text-xs text-gray-400">
                             <div className="flex items-center gap-1">
@@ -123,7 +125,7 @@ const ConversationHistory: React.FC = () => {
                           size="sm"
                           className="text-gray-400 hover:text-white"
                         >
-                          View
+                          {t('history.view')}
                         </Button>
                       </div>
                     </motion.div>
@@ -148,18 +150,17 @@ const ConversationHistory: React.FC = () => {
               setSelectedConversation(null);
             }}
             onSave={async () => {
-              // No need to save again as it's already saved
               return Promise.resolve();
             }}
             isSaving={false}
             onShare={() => {
               if (navigator.share) {
-                const shareText = `${selectedConversation.summary}\n\nFull Transcript:\n${selectedConversation.transcript}`;
+                const shareText = `${selectedConversation.summary}\n\n${t('conclusion.transcript')}:\n${selectedConversation.transcript}`;
                 navigator.share({
-                  title: "Tax Conversation Summary",
+                  title: t('conclusion.title'),
                   text: shareText,
                 }).catch(error => {
-                  console.error("Error in promise:", error);
+                  console.error("Error sharing:", error);
                 });
               }
             }}
