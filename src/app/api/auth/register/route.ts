@@ -5,9 +5,9 @@ import { User } from '@/models/User';
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, jobTitle } = await req.json();
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !jobTitle) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -29,12 +29,14 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
+      jobTitle,
     });
 
     return NextResponse.json({
       id: user._id,
       name: user.name,
       email: user.email,
+      jobTitle: user.jobTitle,
     });
   } catch (error) {
     console.error('Registration error:', error);
