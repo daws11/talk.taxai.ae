@@ -6,6 +6,10 @@
     "language": "Language",
     "assistantDescription": "Your intelligent tax assistant powered by AI"
   },
+  "theme": {
+    "switchToLight": "Switch to light theme",
+    "switchToDark": "Switch to dark theme"
+  },
   "voice": {
     "title": "Voice Assistant",
     "start": "Start",
@@ -57,5 +61,34 @@
     "save": "Save",
     "saving": "Saving...",
     "generatingSummary": "Generating summary and saving transcript"
+  },
+  "auth": {
+    "tagline": "Your Voice-Powered AI Tax Assistant",
+    "email": "Email Address",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "jobTitle": "Job Title",
+    "jobTitlePlaceholder": "Enter your job title",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "createAccount": "Create account",
+    "creatingAccount": "Creating account...",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "registerHere": "Register here",
+    "signInHere": "Sign in here",
+    "acceptTerms": "I acknowledge that Tax-AI provides AI-generated insights and does not offer certified tax or legal advice.",
+    "disclaimer": "Learn more",
+    "disclaimerTitle": "Disclaimer",
+    "disclaimerText1": "By using TAX-AI, you acknowledge and accept that, as with any large language model, it may generate incorrect, misleading, or potentially offensive information. The content provided is AI-generated and intended solely for informational purposes. It does not constitute professional tax, legal, or financial advice and should not be relied upon as such.",
+    "disclaimerText2": "TAX-AI and its affiliates make no representations or warranties regarding the accuracy or completeness of the content. You are solely responsible for any actions taken based on the information provided. We welcome feedback and are continually improving our models and services.",
+    "disclaimerText3": "For more information, please visit our Disclaimer and Privacy Policy pages.",
+    "acceptDisclaimer": "Please accept the disclaimer to continue",
+    "invalidCredentials": "Invalid email or password",
+    "error": "An error occurred. Please try again.",
+    "close": "Close"
   }
 } 

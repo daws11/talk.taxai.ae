@@ -74,24 +74,24 @@ const ConversationHistory: React.FC = () => {
 
   return (
     <div className="w-full max-w-2xl mx-auto mt-8">
-      <Card className="w-full bg-gray-900/50 backdrop-blur-sm border-gray-800">
+      <Card className="w-full bg-card/50 backdrop-blur-sm border-border">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
+          <CardTitle className="text-card-foreground flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />
             {t('history.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-muted-foreground">
               {t('history.loading')}
             </div>
           ) : error ? (
-            <div className="text-center py-8 text-red-400">
+            <div className="text-center py-8 text-destructive">
               {t('history.error')}
             </div>
           ) : conversations.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-muted-foreground">
               {t('history.empty')}
             </div>
           ) : (
@@ -103,15 +103,15 @@ const ConversationHistory: React.FC = () => {
                       key={conversation._id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-gray-800/50 rounded-lg p-4 cursor-pointer hover:bg-gray-800/70 transition-colors"
+                      className="bg-accent/50 rounded-lg p-4 cursor-pointer hover:bg-accent/70 transition-colors border border-border"
                       onClick={() => handleConversationClick(conversation)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="space-y-1">
-                          <p className="text-sm text-gray-300 line-clamp-2">
+                          <p className="text-sm text-card-foreground line-clamp-2">
                             {conversation.summary || t('history.noSummary')}
                           </p>
-                          <div className="flex items-center gap-4 text-xs text-gray-400">
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
                               <span>{formatDate(conversation.createdAt)}</span>
@@ -123,7 +123,7 @@ const ConversationHistory: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-gray-400 hover:text-white"
+                          className="text-muted-foreground hover:text-foreground hover:bg-accent"
                         >
                           {t('history.view')}
                         </Button>
@@ -132,8 +132,11 @@ const ConversationHistory: React.FC = () => {
                   ))}
                 </div>
               </ScrollArea.Viewport>
-              <ScrollArea.Scrollbar orientation="vertical" className="flex w-2.5 touch-none select-none bg-gray-800/50 p-0.5">
-                <ScrollArea.Thumb className="relative flex-1 rounded-full bg-gray-600" />
+              <ScrollArea.Scrollbar 
+                orientation="vertical" 
+                className="flex w-2.5 touch-none select-none bg-accent/50 p-0.5"
+              >
+                <ScrollArea.Thumb className="relative flex-1 rounded-full bg-muted" />
               </ScrollArea.Scrollbar>
             </ScrollArea.Root>
           )}

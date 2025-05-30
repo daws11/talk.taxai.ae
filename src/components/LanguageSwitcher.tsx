@@ -22,7 +22,7 @@ export default function LanguageSwitcher() {
 
   const languages = [
     { code: 'en', name: 'English', countryCode: 'GB' },
-    { code: 'ar', name: 'العربية', countryCode: 'SA' },
+    { code: 'ar', name: 'العربية', countryCode: 'AE' },
     { code: 'ch', name: '中文', countryCode: 'CN' },
     { code: 'ru', name: 'Русский', countryCode: 'RU' },
   ] as const;
@@ -33,14 +33,14 @@ export default function LanguageSwitcher() {
         variant="ghost"
         size="icon"
         onClick={() => setIsOpen(!isOpen)}
-        className="text-gray-400 hover:text-white hover:bg-gray-800"
+        className="text-muted-foreground hover:text-foreground hover:bg-accent"
       >
         <Globe className="h-4 w-4" />
       </Button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50">
-          <div className="py-1">
+        <div className="fixed sm:absolute sm:right-0 left-0 sm:left-auto mt-2 w-[280px] sm:w-48 bg-popover border border-border rounded-lg shadow-lg z-[100] sm:origin-top-right origin-top-left transform-gpu mx-4 sm:mx-0">
+          <div className="py-1 max-h-[80vh] overflow-y-auto">
             {languages.map((lang) => (
               <button
                 key={lang.code}
@@ -50,8 +50,8 @@ export default function LanguageSwitcher() {
                 }}
                 className={`w-full flex items-center justify-between px-4 py-2 text-sm ${
                   language === lang.code
-                    ? 'bg-indigo-500/20 text-white'
-                    : 'text-gray-300 hover:bg-gray-700/50'
+                    ? 'bg-primary/20 text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export default function LanguageSwitcher() {
                   <span>{lang.name}</span>
                 </span>
                 {language === lang.code && (
-                  <Check className="h-4 w-4 text-indigo-400" />
+                  <Check className="h-4 w-4 text-primary" />
                 )}
               </button>
             ))}

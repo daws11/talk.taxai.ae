@@ -551,11 +551,11 @@ const VoiceChat = () => {
   return (
     <>
       <div className="w-full max-w-2xl mx-auto space-y-6">
-        <Card className="w-full bg-gray-900/50 backdrop-blur-sm border-gray-800">
+        <Card className="w-full bg-card/50 backdrop-blur-sm border-border">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between text-white">
+            <CardTitle className="flex items-center justify-between text-card-foreground">
               <div className="flex items-center space-x-2">
-                <div className={`w-3 h-3 rounded-full ${status === "connected" ? "bg-green-500" : "bg-gray-500"}`} />
+                <div className={`w-3 h-3 rounded-full ${status === "connected" ? "bg-green-500" : "bg-muted"}`} />
                 <span>{t('voice.title')}</span>
               </div>
               <div className="flex gap-2">
@@ -563,7 +563,7 @@ const VoiceChat = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowSettings(true)}
-                  className="text-gray-400 hover:text-white hover:bg-gray-800"
+                  className="text-muted-foreground hover:text-foreground hover:bg-accent"
                 >
                   <Settings className="h-4 w-4" />
                 </Button>
@@ -572,7 +572,7 @@ const VoiceChat = () => {
                   size="icon"
                   onClick={toggleMute}
                   disabled={status !== "connected" || !isBrowserSupported}
-                  className="text-gray-400 hover:text-white hover:bg-gray-800"
+                  className="text-muted-foreground hover:text-foreground hover:bg-accent"
                 >
                   {isMuted ? (
                     <VolumeX className="h-4 w-4" />
@@ -591,12 +591,12 @@ const VoiceChat = () => {
                     variant="destructive"
                     onClick={handleEndConversation}
                     disabled={!isBrowserSupported || isEndingConversation}
-                    className="w-24 h-24 rounded-full bg-red-500 hover:bg-red-600 text-white flex flex-col items-center justify-center gap-2 relative"
+                    className="w-24 h-24 rounded-full bg-destructive hover:bg-destructive/90 text-destructive-foreground flex flex-col items-center justify-center gap-2 relative"
                   >
                     {isEndingConversation ? (
                       <>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <Loader2 className="h-8 w-8 animate-spin text-white" />
+                          <Loader2 className="h-8 w-8 animate-spin text-destructive-foreground" />
                         </div>
                         <span className="opacity-0">{t('voice.end')}</span>
                       </>
@@ -611,7 +611,7 @@ const VoiceChat = () => {
                   <Button
                     onClick={handleStartConversation}
                     disabled={!hasPermission || !isBrowserSupported}
-                    className="w-24 h-24 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex flex-col items-center justify-center gap-2"
+                    className="w-24 h-24 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground flex flex-col items-center justify-center gap-2"
                   >
                     <Mic className="h-6 w-6" />
                     <span className="text-sm">{t('voice.start')}</span>
@@ -621,12 +621,12 @@ const VoiceChat = () => {
 
               <div className="text-center text-sm space-y-2">
                 {!isBrowserSupported && (
-                  <p className="text-red-400 bg-red-900/20 p-2 rounded">
+                  <p className="text-destructive bg-destructive/10 p-2 rounded">
                     {t('voice.browserNotSupported')}
                   </p>
                 )}
                 {status === "connected" && (
-                  <p className="text-green-400">
+                  <p className="text-green-500">
                     {isEndingConversation ? (
                       <span className="flex items-center justify-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -640,12 +640,12 @@ const VoiceChat = () => {
                   </p>
                 )}
                 {errorMessage && isBrowserSupported && (
-                  <p className="text-red-400 bg-red-900/20 p-2 rounded">
+                  <p className="text-destructive bg-destructive/10 p-2 rounded">
                     {errorMessage}
                   </p>
                 )}
                 {!hasPermission && isBrowserSupported && (
-                  <p className="text-yellow-400 bg-yellow-900/20 p-2 rounded">
+                  <p className="text-yellow-500 bg-yellow-500/10 p-2 rounded">
                     {t('voice.microphoneRequired')}
                   </p>
                 )}
@@ -661,19 +661,19 @@ const VoiceChat = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50"
           >
-            <div className="bg-gray-900/95 p-8 rounded-lg shadow-xl border border-gray-800 flex flex-col items-center gap-4">
+            <div className="bg-card/95 p-8 rounded-lg shadow-xl border border-border flex flex-col items-center gap-4">
               <div className="relative">
-                <Loader2 className="h-12 w-12 animate-spin text-indigo-400" />
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="h-8 w-8 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
+                  <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
                 </div>
               </div>
-              <p className="text-gray-300 text-center">
+              <p className="text-card-foreground text-center">
                 {t('voice.processing')}
               </p>
-              <p className="text-gray-400 text-sm text-center">
+              <p className="text-muted-foreground text-sm text-center">
                 {t('conclusion.generatingSummary')}
               </p>
             </div>
@@ -714,17 +714,17 @@ const VoiceChat = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           >
-            <Card className="w-full max-w-md bg-gray-900/95 border-gray-800">
+            <Card className="w-full max-w-md bg-card/95 border-border">
               <CardHeader>
-                <CardTitle className="text-white flex items-center justify-between">
+                <CardTitle className="text-card-foreground flex items-center justify-between">
                   <span>{t('settings.title')}</span>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => setShowSettings(false)}
-                    className="text-gray-400 hover:text-white hover:bg-gray-800"
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -732,18 +732,18 @@ const VoiceChat = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-gray-300">{t('settings.microphone')}</h3>
+                  <h3 className="text-sm font-medium text-card-foreground">{t('settings.microphone')}</h3>
                   {isLoadingDevices ? (
                     <div className="flex items-center justify-center py-4">
-                      <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                     </div>
                   ) : audioDevices.length === 0 ? (
-                    <p className="text-sm text-gray-400">{t('settings.noMicrophones')}</p>
+                    <p className="text-sm text-muted-foreground">{t('settings.noMicrophones')}</p>
                   ) : (
                     <div className="relative" ref={micDropdownRef}>
                       <button
                         onClick={() => setIsMicDropdownOpen(!isMicDropdownOpen)}
-                        className="w-full flex items-center justify-between p-3 rounded-lg text-sm bg-gray-800/50 border border-gray-700/30 text-gray-300 hover:bg-gray-800/70"
+                        className="w-full flex items-center justify-between p-3 rounded-lg text-sm bg-accent/50 border border-border text-card-foreground hover:bg-accent/70"
                       >
                         <span className="flex items-center gap-2">
                           <Mic className="h-4 w-4" />
@@ -752,7 +752,7 @@ const VoiceChat = () => {
                         <ChevronDown className={`h-4 w-4 transition-transform ${isMicDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
                       {isMicDropdownOpen && (
-                        <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        <div className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
                           {audioDevices.map((device) => (
                             <button
                               key={device.deviceId}
@@ -760,10 +760,10 @@ const VoiceChat = () => {
                                 switchAudioDevice(device.deviceId);
                                 setIsMicDropdownOpen(false);
                               }}
-                              className={`w-full flex items-center justify-between p-3 text-sm hover:bg-gray-700/50 ${
+                              className={`w-full flex items-center justify-between p-3 text-sm hover:bg-accent/50 ${
                                 selectedDeviceId === device.deviceId
-                                  ? 'bg-indigo-500/20 text-white'
-                                  : 'text-gray-300'
+                                  ? 'bg-primary/20 text-primary-foreground'
+                                  : 'text-card-foreground'
                               }`}
                             >
                               <span className="flex items-center gap-2">
@@ -771,7 +771,7 @@ const VoiceChat = () => {
                                 {device.label}
                               </span>
                               {selectedDeviceId === device.deviceId && (
-                                <Check className="h-4 w-4 text-indigo-400" />
+                                <Check className="h-4 w-4 text-primary" />
                               )}
                             </button>
                           ))}
@@ -782,7 +782,7 @@ const VoiceChat = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-gray-300">{t('settings.audioOutput')}</h3>
+                  <h3 className="text-sm font-medium text-card-foreground">{t('settings.audioOutput')}</h3>
                   {isMobile ? (
                     <div className="space-y-2">
                       <div className="grid grid-cols-3 gap-2">
@@ -790,8 +790,8 @@ const VoiceChat = () => {
                           onClick={() => setAudioOutput('auto')}
                           className={`flex items-center justify-center p-3 rounded-lg text-sm ${
                             audioOutputMode === 'auto'
-                              ? 'bg-indigo-500/20 text-white'
-                              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800/70'
+                              ? 'bg-primary/20 text-primary-foreground'
+                              : 'bg-accent/50 text-card-foreground hover:bg-accent/70'
                           }`}
                         >
                           <span className="flex items-center gap-2">
@@ -803,8 +803,8 @@ const VoiceChat = () => {
                           onClick={() => setAudioOutput('speaker')}
                           className={`flex items-center justify-center p-3 rounded-lg text-sm ${
                             audioOutputMode === 'speaker'
-                              ? 'bg-indigo-500/20 text-white'
-                              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800/70'
+                              ? 'bg-primary/20 text-primary-foreground'
+                              : 'bg-accent/50 text-card-foreground hover:bg-accent/70'
                           }`}
                         >
                           <span className="flex items-center gap-2">
@@ -816,8 +816,8 @@ const VoiceChat = () => {
                           onClick={() => setAudioOutput('earpiece')}
                           className={`flex items-center justify-center p-3 rounded-lg text-sm ${
                             audioOutputMode === 'earpiece'
-                              ? 'bg-indigo-500/20 text-white'
-                              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-800/70'
+                              ? 'bg-primary/20 text-primary-foreground'
+                              : 'bg-accent/50 text-card-foreground hover:bg-accent/70'
                           }`}
                         >
                           <span className="flex items-center gap-2">
@@ -826,7 +826,7 @@ const VoiceChat = () => {
                           </span>
                         </Button>
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         {isMobile ? t('settings.mobileAudioOutput') : t('settings.desktopAudioOutput')}
                       </p>
                     </div>
@@ -835,7 +835,7 @@ const VoiceChat = () => {
                       <div className="relative" ref={speakerDropdownRef}>
                         <button
                           onClick={() => setIsSpeakerDropdownOpen(!isSpeakerDropdownOpen)}
-                          className="w-full flex items-center justify-between p-3 rounded-lg text-sm bg-gray-800/50 border border-gray-700/30 text-gray-300 hover:bg-gray-800/70"
+                          className="w-full flex items-center justify-between p-3 rounded-lg text-sm bg-accent/50 border border-border text-card-foreground hover:bg-accent/70"
                         >
                           <span className="flex items-center gap-2">
                             <Volume2 className="h-4 w-4" />
@@ -844,7 +844,7 @@ const VoiceChat = () => {
                           <ChevronDown className={`h-4 w-4 transition-transform ${isSpeakerDropdownOpen ? 'rotate-180' : ''}`} />
                         </button>
                         {isSpeakerDropdownOpen && (
-                          <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                          <div className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
                             {speakerDevices.map((device) => (
                               <button
                                 key={device.deviceId}
@@ -852,10 +852,10 @@ const VoiceChat = () => {
                                   switchAudioDevice(device.deviceId);
                                   setIsSpeakerDropdownOpen(false);
                                 }}
-                                className={`w-full flex items-center justify-between p-3 text-sm hover:bg-gray-700/50 ${
+                                className={`w-full flex items-center justify-between p-3 text-sm hover:bg-accent/50 ${
                                   selectedSpeakerId === device.deviceId
-                                    ? 'bg-indigo-500/20 text-white'
-                                    : 'text-gray-300'
+                                    ? 'bg-primary/20 text-primary-foreground'
+                                    : 'text-card-foreground'
                                 }`}
                               >
                                 <span className="flex items-center gap-2">
@@ -863,7 +863,7 @@ const VoiceChat = () => {
                                   {device.label}
                                 </span>
                                 {selectedSpeakerId === device.deviceId && (
-                                  <Check className="h-4 w-4 text-indigo-400" />
+                                  <Check className="h-4 w-4 text-primary" />
                                 )}
                               </button>
                             ))}
@@ -874,11 +874,11 @@ const VoiceChat = () => {
                   )}
                 </div>
 
-                <div className="pt-4 border-t border-gray-800">
+                <div className="pt-4 border-t border-border">
                   <Button
                     variant="outline"
                     onClick={() => setShowSettings(false)}
-                    className="w-full text-gray-300 hover:text-white border-gray-700 hover:border-gray-600"
+                    className="w-full text-card-foreground hover:text-foreground border-border hover:border-border/80"
                   >
                     {t('settings.close')}
                   </Button>

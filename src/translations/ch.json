@@ -6,6 +6,10 @@
       "language": "语言",
       "assistantDescription": "您的智能AI税务助手"
     },
+    "theme": {
+      "switchToLight": "切换到浅色主题",
+      "switchToDark": "切换到深色主题"
+    },
     "voice": {
       "title": "语音助手",
       "start": "开始",
@@ -57,5 +61,34 @@
       "save": "保存",
       "saving": "保存中...",
       "generatingSummary": "生成摘要并保存记录"
+    },
+    "auth": {
+      "tagline": "您的语音驱动AI税务助手",
+      "email": "电子邮箱",
+      "emailPlaceholder": "输入您的电子邮箱",
+      "password": "密码",
+      "passwordPlaceholder": "输入您的密码",
+      "fullName": "全名",
+      "fullNamePlaceholder": "输入您的全名",
+      "jobTitle": "职位",
+      "jobTitlePlaceholder": "输入您的职位",
+      "signIn": "登录",
+      "signingIn": "正在登录...",
+      "createAccount": "创建账户",
+      "creatingAccount": "正在创建账户...",
+      "noAccount": "还没有账户？",
+      "haveAccount": "已有账户？",
+      "registerHere": "在此注册",
+      "signInHere": "在此登录",
+      "acceptTerms": "我确认Tax-AI提供AI生成的见解，不提供认证的税务或法律建议。",
+      "disclaimer": "了解更多",
+      "disclaimerTitle": "免责声明",
+      "disclaimerText1": "使用TAX-AI时，您承认并接受，与任何大型语言模型一样，它可能会生成不正确、误导性或可能具有冒犯性的信息。提供的内容由AI生成，仅用于信息目的。它不构成专业的税务、法律或财务建议，不应被依赖为如此。",
+      "disclaimerText2": "TAX-AI及其附属公司对内容的准确性或完整性不作任何陈述或保证。您对基于所提供信息采取的任何行动负全责。我们欢迎反馈，并不断改进我们的模型和服务。",
+      "disclaimerText3": "有关更多信息，请访问我们的免责声明和隐私政策页面。",
+      "acceptDisclaimer": "请接受免责声明以继续",
+      "invalidCredentials": "电子邮箱或密码无效",
+      "error": "发生错误。请重试。",
+      "close": "关闭"
     }
   }
