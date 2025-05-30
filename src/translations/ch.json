@@ -4,7 +4,12 @@
       "signOut": "退出登录",
       "settings": "设置",
       "language": "语言",
-      "assistantDescription": "您的智能AI税务助手"
+      "assistantDescription": "您的智能AI税务助手",
+      "profile": {
+        "tokenUsage": "令牌使用量",
+        "freeTrial": "免费试用 (剩余{{days}}天)",
+        "upgradeNow": "立即升级！"
+      }
     },
     "theme": {
       "switchToLight": "切换到浅色主题",

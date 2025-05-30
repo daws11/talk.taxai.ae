@@ -4,7 +4,12 @@
       "signOut": "Выйти",
       "settings": "Настройки",
       "language": "Язык",
-      "assistantDescription": "Ваш интеллектуальный налоговый помощник на базе ИИ"
+      "assistantDescription": "Ваш интеллектуальный налоговый помощник на базе ИИ",
+      "profile": {
+        "tokenUsage": "Использование токенов",
+        "freeTrial": "Пробный период (осталось {{days}} дней)",
+        "upgradeNow": "Обновить сейчас!"
+      }
     },
     "theme": {
       "switchToLight": "Переключить на светлую тему",

@@ -4,7 +4,12 @@
     "signOut": "Sign Out",
     "settings": "Settings",
     "language": "Language",
-    "assistantDescription": "Your intelligent tax assistant powered by AI"
+    "assistantDescription": "Your intelligent tax assistant powered by AI",
+    "profile": {
+      "tokenUsage": "Token Usage",
+      "freeTrial": "Free Trial ({{days}} days left)",
+      "upgradeNow": "Upgrade Now!"
+    }
   },
   "theme": {
     "switchToLight": "Switch to light theme",

@@ -4,7 +4,12 @@
     "signOut": "تسجيل الخروج",
     "settings": "الإعدادات",
     "language": "اللغة",
-    "assistantDescription": "مساعدك الضريبي الذكي المدعوم بالذكاء الاصطناعي"
+    "assistantDescription": "مساعدك الضريبي الذكي المدعوم بالذكاء الاصطناعي",
+    "profile": {
+      "tokenUsage": "استخدام الرموز",
+      "freeTrial": "تجربة مجانية (متبقي {{days}} أيام)",
+      "upgradeNow": "ترقية الآن!"
+    }
   },
   "theme": {
     "switchToLight": "التبديل إلى المظهر الفاتح",
