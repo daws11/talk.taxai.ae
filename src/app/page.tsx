@@ -57,26 +57,6 @@ export default function Home() {
         </div>
 
         <VoiceComponent />
-
-        <div className="mt-8 text-center space-y-4">
-          <p className="text-sm text-muted-foreground">
-            {t('voice.microphoneRequired')}
-          </p>
-          <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
-            <span className="flex items-center">
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-              {t('voice.realTimeProcessing')}
-            </span>
-            <span className="flex items-center">
-              <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-              {t('voice.aiResponses')}
-            </span>
-            <span className="flex items-center">
-              <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-              {t('voice.liveTranscription')}
-            </span>
-          </div>
-        </div>
         <ConversationHistory />
       </div>
     </main>

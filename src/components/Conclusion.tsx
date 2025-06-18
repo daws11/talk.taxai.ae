@@ -13,7 +13,8 @@ interface ConclusionProps {
   onClose: () => void;
   onSave: () => Promise<void>;
   isSaving: boolean;
-  onShare: () => void;
+  isGenerating?: boolean;
+  onShare?: () => void;
 }
 
 const Conclusion: React.FC<ConclusionProps> = ({
