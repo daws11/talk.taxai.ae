@@ -5,6 +5,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   jobTitle: string;
+  language?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,19 +27,11 @@ const UserSchema = new Schema({
   jobTitle: {
     type: String,
     required: true,
-    enum: [
-      'Tax Consultant',
-      'Tax Manager',
-      'Tax Director',
-      'Tax Partner',
-      'Tax Associate',
-      'Tax Specialist',
-      'Tax Analyst',
-      'Tax Advisor',
-      'Tax Accountant',
-      'Other'
-    ]
-  }
+  },
+  language: {
+    type: String,
+    default: null,
+  },
 }, {
   timestamps: true,
 });

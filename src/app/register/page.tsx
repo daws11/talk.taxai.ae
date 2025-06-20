@@ -27,7 +27,7 @@ export default function RegisterPage() {
 
     const formData = new FormData(e.currentTarget);
     const data = {
-      fullName: formData.get('fullName') as string,
+      name: formData.get('fullName') as string,
       email: formData.get('email') as string,
       jobTitle: formData.get('jobTitle') as string,
       password: formData.get('password') as string,

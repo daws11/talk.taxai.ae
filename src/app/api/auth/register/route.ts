@@ -5,7 +5,7 @@ import { User } from '@/models/User';
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password, jobTitle } = await req.json();
+    const { name, email, password, jobTitle, language } = await req.json();
 
     if (!name || !email || !password || !jobTitle) {
       return NextResponse.json(
@@ -30,6 +30,7 @@ export async function POST(req: Request) {
       email,
       password: hashedPassword,
       jobTitle,
+      ...(language ? { language } : {}),
     });
 
     return NextResponse.json({
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
       name: user.name,
       email: user.email,
       jobTitle: user.jobTitle,
+      language: user.language,
     });
   } catch (error) {
     console.error('Registration error:', error);
