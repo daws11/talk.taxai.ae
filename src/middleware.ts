@@ -12,13 +12,13 @@ const customMiddleware = async (req: NextRequest) => {
   if (token) {
     try {
       const user = jwt.verify(token, NEXTAUTH_SECRET!);
-      // Set session cookie for NextAuth (jwt strategy)
-      // NextAuth expects a session token in a cookie named 'next-auth.session-token' (for production) or '__Secure-next-auth.session-token' (for HTTPS)
-      // We'll use the production cookie name for simplicity
+      // Pilih nama cookie sesuai protokol
+      const isHttps = req.nextUrl.protocol === 'https:' || req.headers.get('x-forwarded-proto') === 'https';
+      const cookieName = isHttps ? '__Secure-next-auth.session-token' : 'next-auth.session-token';
       const response = NextResponse.redirect(new URL(url.pathname, req.url));
-      response.cookies.set('next-auth.session-token', token, {
+      response.cookies.set(cookieName, token, {
         httpOnly: true,
-        secure: true,
+        secure: isHttps,
         sameSite: 'lax',
         path: '/',
       });
