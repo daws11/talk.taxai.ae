@@ -1,29 +1,24 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import { withAuth } from 'next-auth/middleware';
-import jwt from 'jsonwebtoken';
 
-const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
-
-const customMiddleware = async (req: NextRequest) => {
+const handler = async (req: NextRequest) => {
   const url = new URL(req.url);
   const token = url.searchParams.get('token');
 
   if (token) {
-    try {
-      const user = jwt.verify(token, NEXTAUTH_SECRET!);
-      // Pilih nama cookie sesuai protokol
-      const isHttps = req.nextUrl.protocol === 'https:' || req.headers.get('x-forwarded-proto') === 'https';
-      const cookieName = isHttps ? '__Secure-next-auth.session-token' : 'next-auth.session-token';
-      const response = NextResponse.redirect(new URL(url.pathname, req.url));
-      response.cookies.set(cookieName, token, {
-        httpOnly: true,
-        secure: isHttps,
-        sameSite: 'lax',
-        path: '/',
-      });
-      return response;
-    } catch (e) {
+    // Call the token-login endpoint to handle automatic login
+    const loginRes = await fetch(`${url.origin}/api/auth/token-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+      credentials: 'include',
+    });
+    if (loginRes.ok) {
+      // Redirect to the same path without the token query
+      const cleanUrl = new URL(url.pathname, req.url);
+      return NextResponse.redirect(cleanUrl);
+    } else {
       // Token invalid/expired, redirect to login
       return NextResponse.redirect(new URL('/login', req.url));
     }
@@ -32,7 +27,7 @@ const customMiddleware = async (req: NextRequest) => {
   return NextResponse.next();
 };
 
-export default withAuth(customMiddleware, {
+export default withAuth(handler, {
   pages: {
     signIn: '/login',
   },
