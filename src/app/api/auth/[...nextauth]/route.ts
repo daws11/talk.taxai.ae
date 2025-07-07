@@ -45,6 +45,7 @@ const handler = NextAuth({
   ],
   session: {
     strategy: 'jwt',
+    maxAge: 60 * 60 * 24, // 1 hari
   },
   pages: {
     signIn: '/login',
@@ -54,12 +55,16 @@ const handler = NextAuth({
       if (user) {
         token.id = user.id;
         token.language = (user as any).language;
+        token.email = user.email;
+        token.name = user.name;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
         (session.user as any).language = token.language;
       }
       return session;
