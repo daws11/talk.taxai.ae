@@ -70,6 +70,18 @@ const handler = NextAuth({
       return session;
     },
   },
+  cookies: {
+    sessionToken: {
+      name: 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true,
+        domain: process.env.COOKIE_DOMAIN || '.taxai.ae',
+      },
+    },
+  },
 });
 
 export { handler as GET, handler as POST }; 
