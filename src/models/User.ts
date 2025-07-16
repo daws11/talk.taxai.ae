@@ -8,6 +8,23 @@ export interface IUser extends Document {
   language?: string;
   createdAt: Date;
   updatedAt: Date;
+  subscription?: {
+    type?: string;
+    status?: string;
+    messageLimit?: number;
+    remainingMessages?: number;
+    callSeconds?: number;
+    startDate?: Date;
+    endDate?: Date;
+    payment?: {
+      amount?: number;
+      method?: string;
+      lastPaymentDate?: Date;
+      nextPaymentDate?: Date;
+      _id?: any;
+    };
+    _id?: any;
+  };
 }
 
 const UserSchema = new Schema({
@@ -31,6 +48,10 @@ const UserSchema = new Schema({
   language: {
     type: String,
     default: null,
+  },
+  subscription: {
+    type: Object,
+    default: undefined,
   },
 }, {
   timestamps: true,

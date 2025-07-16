@@ -49,6 +49,8 @@ export const useVoiceConversation = ({
   const [isIOS, setIsIOS] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [audioOutputMode, setAudioOutputMode] = useState<'auto' | 'speaker' | 'earpiece'>('auto');
+  const [quotaWarningShown, setQuotaWarningShown] = useState(false);
+  const [quotaExhaustedShown, setQuotaExhaustedShown] = useState(false);
   
   const startTimeRef = useRef<Date | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -56,6 +58,7 @@ export const useVoiceConversation = ({
   const audioDestinationRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const micDropdownRef = useRef<HTMLDivElement | null>(null);
   const speakerDropdownRef = useRef<HTMLDivElement | null>(null);
+  const tickIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize conversation
   const conversation = useConversation({
@@ -239,11 +242,39 @@ export const useVoiceConversation = ({
     updateAudioTrack();
   }, [selectedDeviceId]);
 
+  const getCallSecondsQuota = async (): Promise<number | null> => {
+    try {
+      const res = await fetch("/api/conversations/tick", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tickSeconds: 0 }), // hanya cek quota, tidak mengurangi
+      });
+      const data = await res.json();
+      if (res.ok && typeof data.remaining === 'number') {
+        return data.remaining;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
   // Start conversation
   const startConversation = async () => {
     try {
       if (!hasPermission || !isBrowserSupported) {
         setErrorMessage("Please allow microphone access and use a supported browser");
+        return;
+      }
+
+      // Cek quota sebelum mulai percakapan
+      const quota = await getCallSecondsQuota();
+      if (quota === null) {
+        setErrorMessage("Failed to check your call quota. Please try again later.");
+        return;
+      }
+      if (quota < 10) {
+        setErrorMessage("Your call quota is too low to start a conversation (minimum 10 seconds required). Please top up your quota.");
         return;
       }
 
@@ -263,7 +294,36 @@ export const useVoiceConversation = ({
       
       startTimeRef.current = new Date();
       setConversationTranscript(prev => [...prev, "Assistant: Hello! How can I help you today?"]);
-      
+
+      // Mulai interval tick 1 detik
+      if (tickIntervalRef.current) clearInterval(tickIntervalRef.current);
+      tickIntervalRef.current = setInterval(async () => {
+        try {
+          const res = await fetch("/api/conversations/tick", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tickSeconds: 1 }),
+          });
+          const data = await res.json();
+          if (res.ok && typeof data.remaining === 'number') {
+            if (data.remaining <= 10 && data.remaining > 0 && !quotaWarningShown) {
+              setErrorMessage("⚠️ Your call quota is almost exhausted (" + data.remaining + " seconds left). Please wrap up your conversation.");
+              setQuotaWarningShown(true);
+            }
+          }
+          if (!res.ok || data.remaining === 0) {
+            if (!quotaExhaustedShown) {
+              setErrorMessage("❌ Your call quota has run out. Conversation ended.");
+              setQuotaExhaustedShown(true);
+            }
+            await endConversation();
+            if (tickIntervalRef.current) clearInterval(tickIntervalRef.current);
+          }
+        } catch (e) {
+          // Optional: handle error
+        }
+      }, 1000);
+
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Failed to start conversation";
       setErrorMessage(errorMsg);
@@ -276,6 +336,12 @@ export const useVoiceConversation = ({
     try {
       setIsEndingConversation(true);
       setErrorMessage("");
+      
+      // Stop interval tick
+      if (tickIntervalRef.current) {
+        clearInterval(tickIntervalRef.current);
+        tickIntervalRef.current = null;
+      }
       
       // Stop recording
       if (mediaRecorderRef.current?.state === 'recording') {
