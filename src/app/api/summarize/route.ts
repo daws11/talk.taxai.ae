@@ -30,7 +30,10 @@ export async function POST(req: Request) {
     const llm = new OpenAI({ baseURL, apiKey });
 
     try {
-      const completion = await llm.chat.completions.create({
+      // glm reasoning models spend max_tokens on reasoning_content, which can
+      // leave `content` empty; disable thinking for a short summary.
+      // Ignored by providers that don't support the parameter.
+      const body: Record<string, unknown> = {
         model: process.env.LLM_MODEL || "glm-5.3-flash",
         messages: [
           {
@@ -42,11 +45,18 @@ export async function POST(req: Request) {
             content: transcript,
           },
         ],
-        max_tokens: 150,
+        max_tokens: 600,
         temperature: 0.7,
-      });
+      };
+      if (process.env.LLM_THINKING !== "enabled") {
+        body.thinking = { type: "disabled" };
+      }
 
-      const summary = completion.choices[0]?.message?.content || "No summary generated";
+      const completion = (await llm.chat.completions.create(
+        body as unknown as Parameters<typeof llm.chat.completions.create>[0]
+      )) as { choices?: Array<{ message?: { content?: string | null } }> };
+
+      const summary = completion.choices?.[0]?.message?.content?.trim() || "No summary generated";
       return NextResponse.json({ summary });
     } catch (llmError) {
       console.error("LLM API error:", llmError);
