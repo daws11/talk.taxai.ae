@@ -3,6 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import OpenAI from "openai";
 
+/**
+ * Uses any OpenAI-compatible LLM endpoint configured via env
+ * (LLM_BASE_URL + LLM_API_KEY, model from LLM_MODEL).
+ */
 export async function POST(req: Request) {
   try {
     const { transcript } = await req.json();
@@ -14,13 +18,20 @@ export async function POST(req: Request) {
       );
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const baseURL = process.env.LLM_BASE_URL;
+    const apiKey = process.env.LLM_API_KEY;
+    if (!baseURL || !apiKey) {
+      return NextResponse.json(
+        { error: "LLM is not configured: set LLM_BASE_URL and LLM_API_KEY" },
+        { status: 500 }
+      );
+    }
+
+    const llm = new OpenAI({ baseURL, apiKey });
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+      const completion = await llm.chat.completions.create({
+        model: process.env.LLM_MODEL || "glm-5.3-flash",
         messages: [
           {
             role: "system",
@@ -37,8 +48,8 @@ export async function POST(req: Request) {
 
       const summary = completion.choices[0]?.message?.content || "No summary generated";
       return NextResponse.json({ summary });
-    } catch (openaiError) {
-      console.error("OpenAI API error:", openaiError);
+    } catch (llmError) {
+      console.error("LLM API error:", llmError);
       return NextResponse.json(
         { error: "Failed to generate summary" },
         { status: 500 }
@@ -51,4 +62,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-} 
+}
